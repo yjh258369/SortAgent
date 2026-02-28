@@ -2365,8 +2365,16 @@
 
             const selectedStepDescs = steps.map(s => `${s}. ${stepDescriptions[s]}`).join('\n');
 
-            // 将路径转换为正斜杠格式（Claude Code 使用 Unix 风格路径）
-            const unixPath = targetDir.replace(/\\/g, '/');
+            // 将路径转换为 Git Bash 兼容格式（例如：E:\path -> /e/path）
+            function toUnixPath(winPath) {
+                // 先将反斜杠转为正斜杠
+                let path = winPath.replace(/\\/g, '/');
+                // 匹配磁盘字母，转换为 /x/path 格式（小写磁盘字母，无冒号）
+                // 例如：e:/path -> /e/path 或 E:\path -> /e/path
+                path = path.replace(/^([a-zA-Z]):/i, (match, drive) => '/' + drive.toLowerCase());
+                return path;
+            }
+            const unixPath = toUnixPath(targetDir);
 
             const prompt = `请先切换到目标工作目录：
 
