@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ritwickdey.liveserver",
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-preview-github-styles",
+    "oderwat.indent-rainbow",
+    "eamodio.gitlens",
+    "usernamehw.errorlens"
+  ]
+}

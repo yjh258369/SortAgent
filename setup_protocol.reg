@@ -1,0 +1,28 @@
+Windows Registry Editor Version 5.00
+
+; ============================================
+; Claude Code Task Launcher Protocol Handler
+; 一键启动 Claude Code 任务
+; ============================================
+
+; 注册 claude-task:// 协议
+[HKEY_CLASSES_ROOT\claude-task]
+@="URL:Claude Code Task Launcher Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\claude-task\DefaultIcon]
+@="cmd.exe,1"
+
+[HKEY_CLASSES_ROOT\claude-task\shell]
+
+[HKEY_CLASSES_ROOT\claude-task\shell\open]
+
+[HKEY_CLASSES_ROOT\claude-task\shell\open\command]
+@="\"C:\\Windows\\System32\\wscript.exe\" \"C:\\claude-launcher\\launcher.vbs\" \"%1\""
+
+; ============================================
+; 使用说明:
+; 1. 双击此文件安装注册表
+; 2. 将 launcher.vbs 和 launcher.bat 复制到 C:\claude-launcher\
+; 3. 浏览器中点击 claude-task:// 开头的链接即可启动
+; ============================================
