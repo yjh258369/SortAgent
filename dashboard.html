@@ -2367,24 +2367,57 @@
 
             // 将路径转换为 Git Bash 兼容格式（例如：E:\path -> /e/path）
             function toUnixPath(winPath) {
+                if (!winPath || winPath.trim() === '') {
+                    return '';
+                }
+
                 // 先将反斜杠转为正斜杠
-                let path = winPath.replace(/\\/g, '/');
-                // 匹配磁盘字母，转换为 /x/path 格式（小写磁盘字母，无冒号）
-                // 例如：e:/path -> /e/path 或 E:\path -> /e/path
-                path = path.replace(/^([a-zA-Z]):/i, (match, drive) => '/' + drive.toLowerCase());
-                return path;
+                let path = winPath.trim().replace(/\\/g, '/');
+
+                // 检查是否是有效的绝对路径（以磁盘字母开头，如 E: 或 e:）
+                const driveMatch = path.match(/^([a-zA-Z]):/i);
+                if (driveMatch) {
+                    // 转换为 /x/path 格式（小写磁盘字母，无冒号）
+                    path = '/' + driveMatch[1].toLowerCase() + path.substring(2);
+                    return path;
+                }
+
+                // 如果已经是 Unix 格式（以 / 开头）
+                if (path.startsWith('/')) {
+                    return path;
+                }
+
+                // 相对路径：无法确定完整路径，返回空表示需要用户输入完整路径
+                return '';
             }
+
+            // 验证路径是否有效
+            function isValidPath(path) {
+                if (!path || path.trim() === '') return false;
+                // 检查是否以磁盘字母开头（Windows）或以 / 开头（Unix）
+                return /^[a-zA-Z]:/.test(path) || path.startsWith('/');
+            }
+
             const unixPath = toUnixPath(targetDir);
+            const isValid = isValidPath(targetDir);
+
+            // 如果路径无效，显示警告
+            if (!isValid) {
+                showNotification('⚠️ 请输入完整路径！例如：E:\\运营ERP', 'warning');
+            }
+
+            // 生成路径切换命令
+            const cdCommand = unixPath ? `cd "${unixPath}" && pwd` : `# 请先输入完整路径，例如：cd "/e/运营ERP"`;
 
             const prompt = `请先切换到目标工作目录：
 
 \`\`\`bash
-cd "${unixPath}" && pwd
+${cdCommand}
 \`\`\`
 
 确认目录正确后，请对当前目录执行文档整理任务：
 
-**目标目录**: ${targetDir}
+**目标目录**: ${targetDir}${!isValid ? ' ⚠️ (请输入完整路径，如 E:\\\\运营ERP)' : ''}
 
 **执行步骤**:
 ${selectedStepDescs}
